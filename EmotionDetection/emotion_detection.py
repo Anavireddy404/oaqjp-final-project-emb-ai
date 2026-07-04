@@ -1,56 +1,92 @@
-"""Emotion detection module."""
+# """Emotion detection module."""
 
-import json
-import requests
+# import json
+# import requests
 
 
-def emotion_detector(text_to_analyze):
-    """Analyze text and return emotion scores with dominant emotion."""
-    url = (
-        "https://sn-watson-emotion.labs.skills.network/v1/"
-        "watson.runtime.nlp.v1/NlpService/EmotionPredict"
-    )
+# def emotion_detector(text_to_analyze):
+#     """Analyze text and return emotion scores with dominant emotion."""
+#     url = (
+#         "https://sn-watson-emotion.labs.skills.network/v1/"
+#         "watson.runtime.nlp.v1/NlpService/EmotionPredict"
+#     )
 
-    headers = {
-        "grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock"
-    }
+#     headers = {
+#         "grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock"
+#     }
 
-    input_json = {
-        "raw_document": {
-            "text": text_to_analyze
-        }
-    }
+#     input_json = {
+#         "raw_document": {
+#             "text": text_to_analyze
+#         }
+#     }
 
-    response = requests.post(url, json=input_json, headers=headers)
-    formatted_response = json.loads(response.text)
+#     response = requests.post(url, json=input_json, headers=headers)
+#     formatted_response = json.loads(response.text)
 
-    if response.status_code == 400 or "emotionPredictions" not in formatted_response:
-        return {
-            "anger": None,
-            "disgust": None,
-            "fear": None,
-            "joy": None,
-            "sadness": None,
-            "dominant_emotion": None
-        }
+#     if response.status_code == 400 or "emotionPredictions" not in formatted_response:
+#         return {
+#             "anger": None,
+#             "disgust": None,
+#             "fear": None,
+#             "joy": None,
+#             "sadness": None,
+#             "dominant_emotion": None
+#         }
 
-    emotions = formatted_response["emotionPredictions"][0]["emotion"]
+#     emotions = formatted_response["emotionPredictions"][0]["emotion"]
 
-    emotion_scores = {
-        "anger": emotions["anger"],
-        "disgust": emotions["disgust"],
-        "fear": emotions["fear"],
-        "joy": emotions["joy"],
-        "sadness": emotions["sadness"]
-    }
+#     emotion_scores = {
+#         "anger": emotions["anger"],
+#         "disgust": emotions["disgust"],
+#         "fear": emotions["fear"],
+#         "joy": emotions["joy"],
+#         "sadness": emotions["sadness"]
+#     }
 
-    dominant_emotion = max(emotion_scores, key=emotion_scores.get)
+#     dominant_emotion = max(emotion_scores, key=emotion_scores.get)
 
-    return {
-        "anger": emotion_scores["anger"],
-        "disgust": emotion_scores["disgust"],
-        "fear": emotion_scores["fear"],
-        "joy": emotion_scores["joy"],
-        "sadness": emotion_scores["sadness"],
-        "dominant_emotion": dominant_emotion
-    }
+#     return {
+#         "anger": emotion_scores["anger"],
+#         "disgust": emotion_scores["disgust"],
+#         "fear": emotion_scores["fear"],
+#         "joy": emotion_scores["joy"],
+#         "sadness": emotion_scores["sadness"],
+#         "dominant_emotion": dominant_emotion
+#     }
+
+import unittest
+from EmotionDetection import emotion_detector
+
+
+class TestEmotionDetector(unittest.TestCase):
+
+    def test_emotion_detector(self):
+        self.assertEqual(
+            emotion_detector("I am glad this happened")["dominant_emotion"],
+            "joy"
+        )
+
+        self.assertEqual(
+            emotion_detector("I am really mad about this")["dominant_emotion"],
+            "anger"
+        )
+
+        self.assertEqual(
+            emotion_detector("I feel disgusted just hearing about this")["dominant_emotion"],
+            "disgust"
+        )
+
+        self.assertEqual(
+            emotion_detector("I am so sad about this")["dominant_emotion"],
+            "sadness"
+        )
+
+        self.assertEqual(
+            emotion_detector("I am really afraid that this will happen")["dominant_emotion"],
+            "fear"
+        )
+
+
+if __name__ == "__main__":
+    unittest.main() 
